@@ -48,6 +48,7 @@ const sendOtp = async (req, res, next) => {
       status: true,
       message: "OTP sent successfully",
       otp_id,
+        otp,     
       expires_in: expiresInSeconds,
     });
   } catch (error) {
@@ -208,6 +209,7 @@ const resendOtp = async (req, res, next) => {
       status: true,
       message: "OTP resent successfully",
       otp_id: new_otp_id,
+        otp: newOtp,      
       expires_in: expiresInSeconds,
     });
   } catch (error) {
