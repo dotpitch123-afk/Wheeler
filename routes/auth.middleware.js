@@ -21,9 +21,6 @@ const decoded = verifyAccessToken(token);
 console.log("DECODED:", decoded);
 
 req.user = decoded;
-    // const token = authHeader.split(" ")[1];
-    // const decoded = verifyAccessToken(token);
-    // req.user = decoded;
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {

@@ -13,21 +13,43 @@ const vehicleSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // type_id: {
+    //   type: String,
+    //   required: [true, "type_id is required"],
+    //   trim: true,
+    // },
+    // brand_id: {
+    //   type: String,
+    //   required: [true, "brand_id is required"],
+    //   trim: true,
+    // },
+    // model_id: {
+    //   type: String,
+    //   required: [true, "model_id is required"],
+    //   trim: true,
+    // },
+
     type_id: {
-      type: String,
-      required: [true, "type_id is required"],
-      trim: true,
+  type: mongoose.Schema.Types.ObjectId ,
+  ref: "VehicleType",   // ← your exact model name here
+  required: [true, "type_id is required"],
+},
+brand_id: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Brand",         // ← your exact model name here
+  required: [true, "brand_id is required"],
+},
+
+ year: {
+      type: Number,
+      required: [true, "year is required"]
+      
     },
-    brand_id: {
-      type: String,
-      required: [true, "brand_id is required"],
-      trim: true,
-    },
-    model_id: {
-      type: String,
-      required: [true, "model_id is required"],
-      trim: true,
-    },
+model_id: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "VehicleModel",  // ← your exact model name here
+  required: [true, "model_id is required"],
+},
     fuel_type: {
       type: String,
       required: [true, "fuel_type is required"],

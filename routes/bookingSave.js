@@ -21,8 +21,7 @@ router.get ("/home-dashboard",     protect, getHomeDashboard);
 router.get ("/bookings",           protect, getBookingList);
 router.get ("/bookings-details",   protect, getBookingDetails);
 
-// 7.3 Upload Service Bill
-// POST /api/bookings-details/service-bill?booking_id=bk_8829
+
 router.post(
   "/bookings-details/service-bill",
   protect,
