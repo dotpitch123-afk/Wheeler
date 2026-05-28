@@ -329,10 +329,22 @@ const getAllVehicles = async (req, res) => {
       .populate("model_id", "name")
       .sort({ createdAt: -1 });
 
+
+       const transformedVehicles = vehicles.map(vehicle => ({
+      ...vehicle.toObject(),
+      type_id: vehicle.type_id?._id,
+      type_name: vehicle.type_id?.name,
+      brand_id: vehicle.brand_id?._id,
+      brand_name: vehicle.brand_id?.name,
+      model_id: vehicle.model_id?._id,
+      model_name: vehicle.model_id?.name,
+      createdAt: vehicle.createdAt,
+      updatedAt: vehicle.updatedAt
+    }));
     return res.status(200).json({
       status: true,
       message: "All vehicles fetched successfully",
-      data: vehicles,
+      data: transformedVehicles,
     });
   } catch (err) {
     console.error("getAllVehicles error:", err);
@@ -354,17 +366,37 @@ const getVehicleDetail = async (req, res) => {
       .populate("model_id", "name");
 
     if (!vehicle) {
-      return res.status(404).json({ status: false, message: "Vehicle not found" });
+      return res.status(404).json({
+        status: false,
+        message: "Vehicle not found"
+      });
     }
+
+    const transformedVehicle = {
+      ...vehicle.toObject(),
+
+      type_id: vehicle.type_id?._id,
+      type_name: vehicle.type_id?.name,
+
+      brand_id: vehicle.brand_id?._id,
+      brand_name: vehicle.brand_id?.name,
+
+      model_id: vehicle.model_id?._id,
+      model_name: vehicle.model_id?.name,
+
+      createdAt: vehicle.createdAt,
+      updatedAt: vehicle.updatedAt
+    };
 
     return res.status(200).json({
       status: true,
       message: "Vehicle details fetched successfully",
-      data: vehicle,
+      data: transformedVehicle,
     });
 
   } catch (err) {
     console.error("getVehicleDetail error:", err);
+
     return res.status(500).json({
       status: false,
       message: err.message || "Internal server error",
