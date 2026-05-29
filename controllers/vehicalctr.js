@@ -1,5 +1,6 @@
+// const mongoose = require("mongoose");
 // const Vehicle = require("../schema/vehical");
-
+// const Booking = require("../schema/booking");
 // const addVehicle = async (req, res) => {
 //   try {
 //     const {
@@ -7,19 +8,28 @@
 //       brand_id,
 //       model_id,
 //       fuel_type,
-//         year, 
+//       year,
 //       Is_active,
 //       registration_number,
 //       motor_policy_number,
 //     } = req.body;
 
-//     const user_id = req.user.id;
+  
+//     const user_id = new mongoose.Types.ObjectId(req.user.id);
 
 //     if (!user_id) {
-//       return res.status(401).json({
-//         status: false,
-//         message: "Unauthorized",
-//       });
+//       return res.status(401).json({ status: false, message: "Unauthorized" });
+//     }
+
+
+//     if (!mongoose.Types.ObjectId.isValid(type_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid type_id" });
+//     }
+//     if (!mongoose.Types.ObjectId.isValid(brand_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid brand_id" });
+//     }
+//     if (!mongoose.Types.ObjectId.isValid(model_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid model_id" });
 //     }
 
 //     const vehicle = await Vehicle.create({
@@ -28,7 +38,7 @@
 //       brand_id,
 //       model_id,
 //       fuel_type,
-//         year, 
+//       year,
 //       is_active: Is_active,
 //       registration_number,
 //       motor_policy_number,
@@ -44,7 +54,6 @@
 
 //   } catch (err) {
 //     console.error("addVehicle error:", err);
-
 //     return res.status(500).json({
 //       status: false,
 //       message: err.message || "Internal server error",
@@ -52,71 +61,36 @@
 //   }
 // };
 
-// // const getAllVehicles = async (req, res) => {
-// //   try {
-// //     const vehicles = await Vehicle.find().sort({ createdAt: -1 });
-
-// //     return res.status(200).json({
-// //       status: true,
-// //       message: "All vehicles fetched successfully",
-// //       data: vehicles,
-// //     });
-// //   } catch (err) {
-// //     console.error("getAllVehicles error:", err);
-
-// //     return res.status(500).json({
-// //       status: false,
-// //       message: err.message || "Internal server error",
-// //     });
-// //   }
-// // };
-
-
-// // const getVehicleDetail = async (req, res) => {
-// //   try {
-// //     const { id } = req.params;
-
-// //     const vehicle = await Vehicle.findById(id);
-
-// //     if (!vehicle) {
-// //       return res.status(404).json({
-// //         status: false,
-// //         message: "Vehicle not found",
-// //       });
-// //     }
-
-// //     return res.status(200).json({
-// //       status: true,
-// //       message: "Vehicle details fetched successfully",
-// //       data: vehicle,
-// //     });
-
-// //   } catch (err) {
-// //     console.error("getVehicleDetail error:", err);
-
-// //     return res.status(500).json({
-// //       status: false,
-// //       message: err.message || "Internal server error",
-// //     });
-// //   }
-// // };
 
 // const getAllVehicles = async (req, res) => {
 //   try {
-//     const vehicles = await Vehicle.find()
+//     const vehicles = await Vehicle.find({ 
+//    user_id: new mongoose.Types.ObjectId(req.user.id) 
+//   })
 //       .populate("type_id", "name")
 //       .populate("brand_id", "name")
 //       .populate("model_id", "name")
 //       .sort({ createdAt: -1 });
 
+
+//        const transformedVehicles = vehicles.map(vehicle => ({
+//       ...vehicle.toObject(),
+//       type_id: vehicle.type_id?._id,
+//       type_name: vehicle.type_id?.name,
+//       brand_id: vehicle.brand_id?._id,
+//       brand_name: vehicle.brand_id?.name,
+//       model_id: vehicle.model_id?._id,
+//       model_name: vehicle.model_id?.name,
+//       createdAt: vehicle.createdAt,
+//       updatedAt: vehicle.updatedAt
+//     }));
 //     return res.status(200).json({
 //       status: true,
 //       message: "All vehicles fetched successfully",
-//       data: vehicles,
+//       data: transformedVehicles,
 //     });
 //   } catch (err) {
 //     console.error("getAllVehicles error:", err);
-
 //     return res.status(500).json({
 //       status: false,
 //       message: err.message || "Internal server error",
@@ -137,14 +111,30 @@
 //     if (!vehicle) {
 //       return res.status(404).json({
 //         status: false,
-//         message: "Vehicle not found",
+//         message: "Vehicle not found"
 //       });
 //     }
+
+//     const transformedVehicle = {
+//       ...vehicle.toObject(),
+
+//       type_id: vehicle.type_id?._id,
+//       type_name: vehicle.type_id?.name,
+
+//       brand_id: vehicle.brand_id?._id,
+//       brand_name: vehicle.brand_id?.name,
+
+//       model_id: vehicle.model_id?._id,
+//       model_name: vehicle.model_id?.name,
+
+//       createdAt: vehicle.createdAt,
+//       updatedAt: vehicle.updatedAt
+//     };
 
 //     return res.status(200).json({
 //       status: true,
 //       message: "Vehicle details fetched successfully",
-//       data: vehicle,
+//       data: transformedVehicle,
 //     });
 
 //   } catch (err) {
@@ -156,11 +146,11 @@
 //     });
 //   }
 // };
+
+
 // const updateVehicle = async (req, res) => {
 //   try {
 //     const { id } = req.params;
-
-//     // Safe fallback
 //     const body = req.body || {};
 
 //     const {
@@ -168,46 +158,39 @@
 //       brand_id,
 //       model_id,
 //       fuel_type,
+//       year,
 //       is_active,
 //       registration_number,
 //       motor_policy_number,
 //     } = body;
 
+//     if (type_id && !mongoose.Types.ObjectId.isValid(type_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid type_id" });
+//     }
+//     if (brand_id && !mongoose.Types.ObjectId.isValid(brand_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid brand_id" });
+//     }
+//     if (model_id && !mongoose.Types.ObjectId.isValid(model_id)) {
+//       return res.status(400).json({ status: false, message: "Invalid model_id" });
+//     }
+
 //     const vehicle = await Vehicle.findById(id);
 
 //     if (!vehicle) {
-//       return res.status(404).json({
-//         status: false,
-//         message: "Vehicle not found",
-//       });
+//       return res.status(404).json({ status: false, message: "Vehicle not found" });
 //     }
 
-//     // Update fields only if provided
 //     if (type_id) vehicle.type_id = type_id;
 //     if (brand_id) vehicle.brand_id = brand_id;
 //     if (model_id) vehicle.model_id = model_id;
 //     if (fuel_type) vehicle.fuel_type = fuel_type;
+//     if (year) vehicle.year = year;
+//     if (typeof is_active !== "undefined") vehicle.is_active = is_active;
+//     if (registration_number) vehicle.registration_number = registration_number;
+//     if (motor_policy_number) vehicle.motor_policy_number = motor_policy_number;
 
-//     if (typeof is_active !== "undefined") {
-//       vehicle.is_active = is_active;
-//     }
-
-//     if (registration_number) {
-//       vehicle.registration_number = registration_number;
-//     }
-
-//     if (motor_policy_number) {
-//       vehicle.motor_policy_number = motor_policy_number;
-//     }
-
-//     // Update images if uploaded
-//     if (req.files?.front_photo?.[0]?.path) {
-//       vehicle.front_photo = req.files.front_photo[0].path;
-//     }
-
-//     if (req.files?.rear_photo?.[0]?.path) {
-//       vehicle.rear_photo = req.files.rear_photo[0].path;
-//     }
+//     if (req.files?.front_photo?.[0]?.path) vehicle.front_photo = req.files.front_photo[0].path;
+//     if (req.files?.rear_photo?.[0]?.path) vehicle.rear_photo = req.files.rear_photo[0].path;
 
 //     await vehicle.save();
 
@@ -219,7 +202,6 @@
 
 //   } catch (err) {
 //     console.error("updateVehicle error:", err);
-
 //     return res.status(500).json({
 //       status: false,
 //       message: err.message || "Internal server error",
@@ -235,10 +217,7 @@
 //     const vehicle = await Vehicle.findById(id);
 
 //     if (!vehicle) {
-//       return res.status(404).json({
-//         status: false,
-//         message: "Vehicle not found",
-//       });
+//       return res.status(404).json({ status: false, message: "Vehicle not found" });
 //     }
 
 //     await Vehicle.findByIdAndDelete(id);
@@ -250,16 +229,17 @@
 
 //   } catch (err) {
 //     console.error("deleteVehicle error:", err);
-
 //     return res.status(500).json({
 //       status: false,
 //       message: err.message || "Internal server error",
 //     });
 //   }
 // };
-// module.exports = { addVehicle, getAllVehicles, getVehicleDetail, updateVehicle, deleteVehicle}
+
+// module.exports = { addVehicle, getAllVehicles, getVehicleDetail, updateVehicle, deleteVehicle };
 const mongoose = require("mongoose");
 const Vehicle = require("../schema/vehical");
+const Booking = require("../schema/booking");
 
 const addVehicle = async (req, res) => {
   try {
@@ -274,13 +254,12 @@ const addVehicle = async (req, res) => {
       motor_policy_number,
     } = req.body;
 
-    const user_id = req.user.id;
+    const user_id = new mongoose.Types.ObjectId(req.user.id);
 
     if (!user_id) {
       return res.status(401).json({ status: false, message: "Unauthorized" });
     }
 
-    // Validate ObjectIds
     if (!mongoose.Types.ObjectId.isValid(type_id)) {
       return res.status(400).json({ status: false, message: "Invalid type_id" });
     }
@@ -323,24 +302,35 @@ const addVehicle = async (req, res) => {
 
 const getAllVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find()
+    const vehicles = await Vehicle.find({
+      user_id: new mongoose.Types.ObjectId(req.user.id)
+    })
       .populate("type_id", "name")
       .populate("brand_id", "name")
       .populate("model_id", "name")
       .sort({ createdAt: -1 });
 
+    const transformedVehicles = await Promise.all(vehicles.map(async (vehicle) => {
+      const v = vehicle.toObject();
 
-       const transformedVehicles = vehicles.map(vehicle => ({
-      ...vehicle.toObject(),
-      type_id: vehicle.type_id?._id,
-      type_name: vehicle.type_id?.name,
-      brand_id: vehicle.brand_id?._id,
-      brand_name: vehicle.brand_id?.name,
-      model_id: vehicle.model_id?._id,
-      model_name: vehicle.model_id?.name,
-      createdAt: vehicle.createdAt,
-      updatedAt: vehicle.updatedAt
+      const bookings = await Booking.find({
+        vehicle_id: v.vehicle_id,
+        booking_status: { $in: ["completed", "picked_up", "in_service"] }
+      }).sort({ createdAt: -1 }).lean();
+
+      return {
+        ...v,
+        type_id:           vehicle.type_id?._id,
+        type_name:         vehicle.type_id?.name,
+        brand_id:          vehicle.brand_id?._id,
+        brand_name:        vehicle.brand_id?.name,
+        model_id:          vehicle.model_id?._id,
+        model_name:        vehicle.model_id?.name,
+        total_pickups:     bookings.length,
+        last_service_date: bookings.length > 0 ? bookings[0].pickup_date : null,
+      };
     }));
+
     return res.status(200).json({
       status: true,
       message: "All vehicles fetched successfully",
@@ -372,20 +362,23 @@ const getVehicleDetail = async (req, res) => {
       });
     }
 
+    const v = vehicle.toObject();
+
+    const bookings = await Booking.find({
+      vehicle_id: v.vehicle_id,
+      booking_status: { $in: ["completed", "picked_up", "in_service"] }
+    }).sort({ createdAt: -1 }).lean();
+
     const transformedVehicle = {
-      ...vehicle.toObject(),
-
-      type_id: vehicle.type_id?._id,
-      type_name: vehicle.type_id?.name,
-
-      brand_id: vehicle.brand_id?._id,
-      brand_name: vehicle.brand_id?.name,
-
-      model_id: vehicle.model_id?._id,
-      model_name: vehicle.model_id?.name,
-
-      createdAt: vehicle.createdAt,
-      updatedAt: vehicle.updatedAt
+      ...v,
+      type_id:           vehicle.type_id?._id,
+      type_name:         vehicle.type_id?.name,
+      brand_id:          vehicle.brand_id?._id,
+      brand_name:        vehicle.brand_id?.name,
+      model_id:          vehicle.model_id?._id,
+      model_name:        vehicle.model_id?.name,
+      total_pickups:     bookings.length,
+      last_service_date: bookings.length > 0 ? bookings[0].pickup_date : null,
     };
 
     return res.status(200).json({
@@ -396,7 +389,6 @@ const getVehicleDetail = async (req, res) => {
 
   } catch (err) {
     console.error("getVehicleDetail error:", err);
-
     return res.status(500).json({
       status: false,
       message: err.message || "Internal server error",
@@ -421,7 +413,6 @@ const updateVehicle = async (req, res) => {
       motor_policy_number,
     } = body;
 
-    // Validate ObjectIds if provided
     if (type_id && !mongoose.Types.ObjectId.isValid(type_id)) {
       return res.status(400).json({ status: false, message: "Invalid type_id" });
     }
